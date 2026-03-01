@@ -29,6 +29,52 @@ const STYLES = `
   --hero:   'Bebas Neue', cursive;
 }
 
+/* ── LIGHT MODE OVERRIDES ── */
+body.light-mode {
+  --bg:     #f0f4ff;
+  --bg2:    #e4ecfa;
+  --bg3:    #d8e5f7;
+  --blue:   #1a6ed4;
+  --blue2:  #1255b0;
+  --bluedim:#a8c8f8;
+  --cyan:   #0099cc;
+  --green:  #00994d;
+  --red:    #cc1133;
+  --yellow: #b8900a;
+  --orange: #d44a10;
+  --purple: #7a1fc9;
+  --white:  #0d1a2e;
+  --dim:    rgba(10,30,60,0.68);
+  --dimmer: rgba(10,30,60,0.42);
+  --line:   rgba(30,100,200,0.16);
+  --line2:  rgba(30,100,200,0.28);
+}
+
+body.light-mode::after {
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.012) 2px, rgba(0,0,0,0.012) 4px
+  );
+}
+
+body.light-mode .nav {
+  background: rgba(232,240,255,.92);
+}
+
+body.light-mode .sql-gate {
+  background: var(--bg);
+}
+
+body.light-mode .f-input,
+body.light-mode .f-area {
+  color: var(--white);
+}
+
+body.light-mode .f-input::placeholder,
+body.light-mode .f-area::placeholder {
+  color: var(--dimmer);
+}
+
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior: smooth; }
 
@@ -38,6 +84,7 @@ body {
   font-family: var(--body);
   overflow-x: hidden;
   cursor: none;
+  transition: background .35s ease, color .35s ease;
 }
 
 /* scanlines overlay */
@@ -85,6 +132,7 @@ body::after {
   background: white;
   animation: starTwinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
 }
+body.light-mode .star { background: #1a55a8; opacity:.18; }
 @keyframes starTwinkle {
   0%,100% { opacity: var(--lo,.1); transform:scale(1); }
   50%      { opacity: var(--hi,.6); transform:scale(1.4); }
@@ -100,6 +148,7 @@ body::after {
   backdrop-filter: blur(18px) saturate(1.4);
   border-bottom: 1px solid var(--line);
   animation: navSlide .7s ease both;
+  transition: background .35s ease, border-color .35s ease;
 }
 @keyframes navSlide { from{opacity:0;transform:translateY(-18px)} to{opacity:1;transform:translateY(0)} }
 
@@ -122,7 +171,7 @@ body::after {
   color: var(--blue);
 }
 
-.nav-links { display:flex; gap:28px; }
+.nav-links { display:flex; align-items:center; gap:28px; }
 .nav-link {
   font-family: var(--mono);
   font-size:.6rem; letter-spacing:2.5px; text-transform:uppercase;
@@ -137,6 +186,53 @@ body::after {
 }
 .nav-link:hover { color: var(--blue); }
 .nav-link:hover::after { width:100%; }
+
+/* ── THEME TOGGLE ── */
+.theme-toggle {
+  display:flex; align-items:center; justify-content:center;
+  width:38px; height:22px; border-radius:11px;
+  border: 1px solid var(--line2);
+  background: var(--bg3);
+  cursor: pointer;
+  position: relative;
+  transition: background .3s, border-color .3s, box-shadow .3s;
+  flex-shrink: 0;
+  outline: none;
+}
+.theme-toggle:hover {
+  border-color: var(--blue);
+  box-shadow: 0 0 12px rgba(77,166,255,.25);
+}
+.theme-toggle-knob {
+  position: absolute;
+  left: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--blue);
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), background .3s;
+  display: flex; align-items:center; justify-content:center;
+  font-size: .7rem;
+  line-height:1;
+}
+body.light-mode .theme-toggle-knob {
+  transform: translateX(16px);
+}
+.theme-toggle-label {
+  font-family: var(--mono);
+  font-size: .58rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--dimmer);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .2s;
+  user-select: none;
+}
+.theme-toggle-label:hover { color: var(--blue); }
+.theme-toggle-wrap {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer;
+}
 
 /* ── HERO ── */
 .hero {
@@ -333,6 +429,8 @@ body::after {
 .about-body p {
   font-size:1rem; color: var(--dim); line-height:1.9;
   margin-bottom:18px; font-weight:400;
+  text-align: justify;
+  hyphens: auto;
 }
 .about-body strong { color: var(--white); font-weight:600; }
 .about-body .code-inline {
@@ -1108,6 +1206,26 @@ function SHeader({ num, label, color }) {
   );
 }
 
+// ─── THEME TOGGLE ──────────────────────────────────────────────────────────
+function ThemeToggle({ isLight, onToggle }) {
+  return (
+    <div
+      className="theme-toggle-wrap"
+      onClick={onToggle}
+      title={isLight ? "Przełącz na dark mode" : "Przełącz na light mode"}
+    >
+      <span className="theme-toggle-label">
+        {isLight ? "LIGHT" : "DARK"}
+      </span>
+      <button className="theme-toggle" aria-label="toggle theme">
+        <div className="theme-toggle-knob">
+          {isLight ? "☀️" : "🌙"}
+        </div>
+      </button>
+    </div>
+  );
+}
+
 // ─── INTRO ANIMATION ───────────────────────────────────────────────────────
 function Intro({ onDone }) {
   const [text, setText] = useState("");
@@ -1167,6 +1285,15 @@ export default function Portfolio() {
   const tw = useTypewriter(TYPEWRITER_LINES);
   const { dot, ring, hov } = useCursor();
   const [entered, setEntered] = useState(false);
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    if (isLight) {
+      document.body.classList.add("light-mode");
+    } else {
+      document.body.classList.remove("light-mode");
+    }
+  }, [isLight]);
 
   if (!entered) return <Intro onDone={() => setEntered(true)} />;
 
@@ -1191,6 +1318,7 @@ export default function Portfolio() {
             ["Kariera","#career"],["Poza kodem","#fun"],["Kontakt","#contact"]].map(([l,h]) => (
             <a key={l} href={h} className="nav-link">{l}</a>
           ))}
+          <ThemeToggle isLight={isLight} onToggle={() => setIsLight(v => !v)} />
         </div>
       </nav>
 
