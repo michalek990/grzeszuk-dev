@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/grzeszuk-dev/',  // nazwa repo na GitHubie
+  base: '/',  // nazwa repo na GitHubie
 })
